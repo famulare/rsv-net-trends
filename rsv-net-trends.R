@@ -46,7 +46,7 @@ pd = d %>%
 # fit seasonal ends from pre-covid
 m = lm(cumulative_rate ~ Week.ending.date, 
        data=pd %>% 
-         filter(MMWR.Week==18) %>%
+         # filter(MMWR.Week==18) %>%
          filter(Week.ending.date<as.Date('2020-06-01')))
 
 pd2=data.frame(Week.ending.date=seq.Date(as.Date('2018-05-01'),as.Date('2023-05-07'),by='week'))
@@ -73,7 +73,7 @@ pd = d %>%
 # fit seasonal ends from pre-covid
 m = lm(cumulative_rate ~ Week.ending.date, 
        data=pd %>% 
-         filter(MMWR.Week==18) %>%
+         # filter(MMWR.Week==18) %>%
          filter(Week.ending.date<as.Date('2020-06-01')))
 
 pd2=data.frame(Week.ending.date=seq.Date(as.Date('2018-05-01'),as.Date('2023-05-07'),by='week'))
@@ -102,7 +102,7 @@ pd = d %>%
 # fit seasonal ends from pre-covid
 m = lm(cumulative_rate ~ Week.ending.date, 
        data=pd %>% 
-         filter(MMWR.Week==17) %>%
+         # filter(MMWR.Week==17) %>%
          filter(Week.ending.date<as.Date('2020-06-01')))
 
 pd2=data.frame(Week.ending.date=seq.Date(as.Date('2013-05-01'),as.Date('2023-05-07'),by='week'))
@@ -115,3 +115,5 @@ ggplot() +
   xlab('') + ylab('cumulative attack rate per 100k')+
   ggtitle('18+ (adults)')
 ggsave('rsv-net_cumulative_hospitalization_adults.png',units='in',width=6,height=4)
+
+# looks like sampling changed from 2014-2017
