@@ -162,23 +162,27 @@ pd2 = pd2 %>% filter(pre_covid_trend>0) %>%
 
 
 ggplot() +
-  geom_ribbon(data=pd2,aes(x=Week.ending.date,ymin=pre_covid_trend_lower,ymax=pre_covid_trend_upper),alpha=0.3) +
   geom_line(data=pd,aes(x=Week.ending.date,y=cumulative_rate)) +
-  # geom_line(data=pd,aes(x=Week.ending.date,y=1+cumulative_rate,group=State,color=State))+
   geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend),linetype='dashed') +
   facet_wrap('Age.Category',scale='free_y')+
-  # scale_y_continuous(trans='log10') +
   xlab('') + ylab('cumulative attack rate per 100k') +
   scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age.png',units='in',width=6,height=4)
 
 ggplot() +
+  geom_line(data=pd,aes(x=Week.ending.date,y=Rate)) +
+  # geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend),linetype='dashed') +
+  facet_wrap('Age.Category',scale='free_y')+
+  xlab('') + ylab('cumulative attack rate per 100k') +
+  scale_color_viridis_d()
+ggsave('rsv-net_weekly_hospitalization_age.png',units='in',width=6,height=4)
+
+
+ggplot() +
   geom_ribbon(data=pd2,aes(x=Week.ending.date,ymin=pre_covid_trend_lower,ymax=pre_covid_trend_upper),alpha=0.3) +
   geom_line(data=pd,aes(x=Week.ending.date,y=cumulative_rate)) +
-  # geom_line(data=pd,aes(x=Week.ending.date,y=1+cumulative_rate,group=State,color=State))+
   geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend),linetype='dashed') +
   facet_wrap('Age.Category',scale='free_y')+
-  # scale_y_continuous(trans='log10') +
   xlab('') + ylab('cumulative attack rate per 100k') +
   scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age_trend_uncertainty.png',units='in',width=6,height=4)
@@ -220,7 +224,15 @@ pd2=expand.grid(Week.ending.date=seq.Date(as.Date('2013-05-01'),as.Date('2023-05
                 Age.Category = factor(levels(pd$Age.Category),levels=levels(pd$Age.Category)),
                 State=unique(pd$State))
 pd2$pre_covid_trend=predict(m,newdata=pd2)
+
+pd2$pre_covid_trend_lower=predict(m,newdata=pd2)-2*predict(m,newdata=pd2,se=TRUE)$se
+pd2$pre_covid_trend_upper=predict(m,newdata=pd2)+2*predict(m,newdata=pd2,se=TRUE)$se
+
 pd2 = pd2 %>% filter(pre_covid_trend>0)
+
+pd2 = pd2 %>% filter(pre_covid_trend>0) %>%
+  mutate(pre_covid_trend_lower = pmax(0,pre_covid_trend_lower)) %>%
+  mutate(pre_covid_trend_upper = pmax(0,pre_covid_trend_upper)) 
 
 
 # pd = pd %>% left_join(pd2,by = c("State", "Week.ending.date", "Age.Category"))
@@ -229,17 +241,26 @@ pd2 = pd2 %>% filter(pre_covid_trend>0)
 ggplot() +
   geom_line(data=pd,aes(x=Week.ending.date,y=1+cumulative_rate,group=State,color=State))+
   facet_wrap('Age.Category',scale='free_y')+
-  # scale_y_continuous(trans='log10') +
   xlab('') + ylab('cumulative attack rate per 100k') 
-  # scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age_state.png',units='in',width=8,height=6)
 
 ggplot() +
   geom_line(data=pd,aes(x=Week.ending.date,y=cumulative_rate,group=Age.Category, color=Age.Category)) +
-  # geom_line(data=pd,aes(x=Week.ending.date,y=1+cumulative_rate,group=State,color=State))+
   geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend,group=Age.Category, color=Age.Category),linetype='dashed') +
   facet_wrap('State~Age.Category',scale='free_y')+
-  # scale_y_continuous(trans='log10') +
   xlab('') + ylab('cumulative attack rate per 100k') 
-# scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age_state_trends.png',units='in',width=20,height=15)
+
+ggplot() +
+  geom_ribbon(data=pd2,aes(x=Week.ending.date,ymin=pre_covid_trend_lower,ymax=pre_covid_trend_upper),alpha=0.3) +
+  geom_line(data=pd,aes(x=Week.ending.date,y=cumulative_rate,group=Age.Category, color=Age.Category)) +
+  geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend,group=Age.Category, color=Age.Category),linetype='dashed') +
+  facet_wrap('State~Age.Category',scale='free_y')+
+  xlab('') + ylab('cumulative attack rate per 100k') 
+ggsave('rsv-net_cumulative_hospitalization_age_state_trends_uncertainty.png',units='in',width=20,height=15)
+
+ggplot() +
+  geom_line(data=pd,aes(x=Week.ending.date,y=Rate,group=Age.Category, color=Age.Category)) +
+  facet_wrap('State~Age.Category',scale='free_y')+
+  xlab('') + ylab('cumulative attack rate per 100k') 
+ggsave('rsv-net_weekly_hospitalization_age_state.png',units='in',width=20,height=15)
