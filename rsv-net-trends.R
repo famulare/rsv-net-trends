@@ -103,7 +103,8 @@ pd = d %>%
 m = lm(cumulative_rate ~ Week.ending.date, 
        data=pd %>% 
          # filter(MMWR.Week==17) %>%
-         filter(Week.ending.date<as.Date('2020-06-01')))
+         filter(Week.ending.date<as.Date('2020-06-01'))%>%
+         filter(Week.ending.date>as.Date('2017-06-01')))
 
 pd2=data.frame(Week.ending.date=seq.Date(as.Date('2013-05-01'),as.Date('2023-05-07'),by='week'))
 pd2$pre_covid_trend=predict(m,newdata=pd2)
@@ -166,6 +167,7 @@ ggplot() +
   geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend),linetype='dashed') +
   facet_wrap('Age.Category',scale='free_y')+
   xlab('') + ylab('cumulative attack rate per 100k') +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
   scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age.png',units='in',width=6,height=4)
 
@@ -184,6 +186,7 @@ ggplot() +
   geom_line(data=pd2,aes(x=Week.ending.date,y=pre_covid_trend),linetype='dashed') +
   facet_wrap('Age.Category',scale='free_y')+
   xlab('') + ylab('cumulative attack rate per 100k') +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
   scale_color_viridis_d()
 ggsave('rsv-net_cumulative_hospitalization_age_trend_uncertainty.png',units='in',width=6,height=4)
 
